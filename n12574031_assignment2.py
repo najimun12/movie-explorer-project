@@ -374,7 +374,7 @@ def main():
     download_file(DATA_FILE, DATA_URL)
     movies = load_movies(DATA_FILE)
     if not movies:
-        print("No movies loaded — check movies.csv")
+        print("No movies loaded. check movies.csv")
         return
     root = tk.Tk()
     MovieApp(root, movies)
