@@ -17,4 +17,4 @@ Movie Explorer is a Python GUI application built with Tkinter that allows users 
 ## Run
 
 ```bash
-python main.py
+python3 n12574031_assignment2.py
