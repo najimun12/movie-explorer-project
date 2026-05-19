@@ -8,7 +8,11 @@ import os
 import urllib.request
 import tkinter as tk
 from tkinter import ttk, messagebox
-from PIL import Image, ImageTk 
+try:
+    from PIL import Image, ImageTk
+    PILLOW_OK = True  
+except ImportError:
+    PILLOW_OK = False
 
 DATA_URL  = ("https://gist.githubusercontent.com/tiangechen/b68782efa49a16edaf07dc2cdaa855ea"
              "/raw/0c597858daad80b2de834ec5c26a6e5a438a3db/movies.csv")
@@ -16,9 +20,7 @@ DATA_FILE   = "movies.csv"
 BANNER_FILE = "banner.png"
 COLUMNS     = ("Film", "Genre", "Lead Studio", "Audience score %", "Rotten Tomatoes %", "Year")
 
-
 # Colours 
-
 BG      = "#f5f0e8"   
 BG2     = "#ede8de"   
 BG3     = "#e0d9ce"   
@@ -32,14 +34,11 @@ ROW_A   = "#faf7f2"
 ROW_B   = "#f0ebe0"  
 ROW_SEL = "#d4ede8" 
 
-
 # Data Functions
-
 def download_file(path, url):
     """Download CSV only if it does not exist yet."""
     if not os.path.exists(path):
         urllib.request.urlretrieve(url, path)
-
 
 def load_movies(path):
     """Read CSV and return a list of movie dictionaries."""
@@ -155,7 +154,7 @@ class MovieApp:
         header = tk.Frame(self.root, bg=BG2)
         header.pack(fill=tk.X)
         tk.Frame(header, bg=AMBER, height=3).pack(fill=tk.X)
-        if os.path.exists(BANNER_FILE):
+        if PILLOW_OK and os.path.exists(BANNER_FILE):
             try:
                 img = Image.open(BANNER_FILE).resize((1060, 72), Image.LANCZOS)
                 self.banner_img = ImageTk.PhotoImage(img)
@@ -163,7 +162,6 @@ class MovieApp:
             except Exception:
                 pass
 
-        # Centred title below the banner
         tk.Label(header,
                  text="Movie Explorer",
                  font=("Georgia", 18, "bold"),
@@ -179,7 +177,6 @@ class MovieApp:
 
         lbl = {"bg": BG3, "fg": FG2, "font": ("Helvetica", 10)}
 
-        # Search box
         tk.Label(bar, text="Search:", **lbl).grid(row=0, column=0, padx=(0, 5))
         self.search_var = tk.StringVar()
         entry = tk.Entry(bar, textvariable=self.search_var, width=22,
@@ -191,7 +188,6 @@ class MovieApp:
         self.make_button(bar, "Search", self.on_search, TEAL, "#fff").grid(
             row=0, column=2, padx=(0, 22), ipady=2)
 
-        # Genre dropdown
         tk.Label(bar, text="Genre:", **lbl).grid(row=0, column=3, padx=(0, 5))
         self.genre_var = tk.StringVar(value="All")
         genre_box = ttk.Combobox(bar, textvariable=self.genre_var,
@@ -209,7 +205,6 @@ class MovieApp:
         sort_box.grid(row=0, column=6, padx=(0, 5))
         sort_box.bind("<<ComboboxSelected>>", lambda e: self.refresh())
 
-        # Ascending / Descending toggle
         self.dir_label = tk.StringVar(value="↑ Asc")
         self.make_button(bar, None, self.toggle_sort, BG2, TEAL,
                          tv=self.dir_label).grid(row=0, column=7, padx=(0, 22), ipady=2)
@@ -247,15 +242,12 @@ class MovieApp:
                                   selectmode="browse", style="App.Treeview")
         v_scroll.config(command=self.tree.yview)
         h_scroll.config(command=self.tree.xview)
-
-        # Make the table fill all available space
         self.tree.grid(row=0, column=0, sticky="nsew")
         v_scroll.grid(row=0, column=1, sticky="ns")
         h_scroll.grid(row=1, column=0, sticky="ew")
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
-        # Set column widths and attach sort-on-click
         widths = (255, 105, 165, 125, 140, 60)
         for col, w in zip(COLUMNS, widths):
             self.tree.heading(col, text=col,
@@ -273,14 +265,11 @@ class MovieApp:
 
         footer = tk.Frame(self.root, bg=BG2, pady=8)
         footer.pack(fill=tk.X)
-
         tk.Label(footer,
                  text="© Najim Uddin Nayeem ID: n12574031",
                  font=("Helvetica", 11, "bold"),
                  bg=BG2, fg=TEAL).pack()
 
-
-    # Event handlers 
     def on_search(self):
         ok, msg = validate_search(self.search_var.get().strip())
         if not ok:
@@ -381,7 +370,6 @@ class MovieApp:
 
 
 # Run the app
-
 def main():
     download_file(DATA_FILE, DATA_URL)
     movies = load_movies(DATA_FILE)
