@@ -4,10 +4,9 @@ Movie Explorer is a Python GUI application built with Tkinter that allows users 
 
 ## Features
 - Movie search
-- Poster display
+- Movie filter
 - Ratings and genre
 - Simple GUI interface
-- API integration
 
 ## Technologies
 - Python
